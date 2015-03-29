@@ -945,6 +945,12 @@ class Datatables
             $connection = $query->getConnection()->getName();
         }
 
+        $countQuery = clone $query;
+        $this->$count = DB::connection($connection)
+            ->table(DB::raw('(' . $countQuery->toSql() . ') AS count_row_table'))
+            ->setBindings($countQuery->getBindings())->count();
+        return;
+
         // if its a normal query ( no union ) replace the select with static text to improve performance
         $countQuery = clone $query;
         if (!preg_match('/UNION/i', $countQuery->toSql())) {
